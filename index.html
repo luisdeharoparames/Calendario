@@ -7,17 +7,34 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
   </head>
   <body>
-    <h1>Calendarios de el año</h1>
+    <h1 class="h1Calendar"></h1>
     <div id="app">
       <form id="myForm">
-        Introduce el mes del año
-        <input type="text" name="month"/>
-        Itroduce el año
-        <input type="text" name="year" />
-        <button type="submit">Imprimir</button>
+        <div id="divFormMonth">
+          <label for="month"> Introduce el mes: </label>
+          <input type="text" id="month" name="month" placeholder="enero..." />
+        </div>
+
+        <div id="divFormYear">
+          <label for="year"> Introduce el año: </label>
+          <input type="text" id="year" name="year" placeholder="2000" />
+        </div>
+        <div id="divExplicacion">
+          <label for=""
+            >*Si Introduces mes y año solo mostrara por pantalla el mes del año
+            seleccionado</label
+          >
+          <label for=""
+            >*Si Introduces el año solo mostrara por pantalla los meses del año
+            seleccionado</label
+          >
+        </div>
+        <div id="divButton">
+          <button type="submit" id="buttonStyle">Aceptar</button>
+        </div>
       </form>
     </div>
-    <div id="renderTable"></div>
+    <div id="renderCalendar"></div>
     <script src="main.js"></script>
   </body>
 </html>
