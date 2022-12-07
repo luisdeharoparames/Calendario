@@ -14,14 +14,46 @@ const MONTHS = {
 };
 
 const locale = "es";
-const yearDate = 2022;
+// const yearDate = 2022;
 
 (() => {
   const form = document.getElementById("myForm");
-  const div = document.getElementById("renderTable");
+  const renderCalendar = document.getElementById("renderCalendar");
+
+  const inputMonth = document.getElementById("month");
+  inputMonth.addEventListener("change", (i) => {
+    const valueMonth = i.target.value;
+    // console.log(valueI);
+    const valueIs = MONTHS[valueMonth.toLowerCase()];
+    if (
+      !(
+        valueIs !== undefined &&
+        valueIs >= 0 &&
+        valueIs <= 11 &&
+        valueIs !== ""
+      )
+    ) {
+      inputMonth.style.backgroundColor = "red";
+    } else {
+      inputMonth.style.backgroundColor = "green";
+    }
+  });
+
+  const inputYear = document.getElementById("year");
+  inputYear.addEventListener("change", (i) => {
+    const valueYear = i.target.value;
+
+    const year = Number(valueYear);
+    const condicionYaer = year !== "" && !isNaN(year) && year >= 1970;
+    if (condicionYaer) {
+      inputYear.style.backgroundColor = "green";
+    } else {
+      inputYear.style.backgroundColor = "red";
+    }
+  });
+
   form.addEventListener("submit", (e) => {
     e.preventDefault();
-
     const formData = new FormData(e.target);
     checkData(Object.fromEntries(formData));
 
@@ -30,19 +62,21 @@ const yearDate = 2022;
     // }
 
     //Month && Year
-    //  const { isExists, month: monthName } = monthExists(month);
-    // if (isExists && isExistsYear) {
-    //   createTable(monthName, yearName);
-    // } else if (!isExists && isExistsYear) {
-    //   getAllMonths(year);
-    // }
+    const { isExists, month: monthName } = monthExists(month);
+    const { isExistsYear, year: yearName } = yearExists(year);
+    if (isExists && isExistsYear) {
+      createTable(monthName, yearName);
+    } else if (!isExists && isExistsYear) {
+      getAllMonths(year);
+    }
     //div.innerText = " El dato introducido no es un mes ni un año";
   });
+
   const checkData = ({ month, year }) => {
-    div.innerText = "";
+    renderCalendar.innerText = "";
     const isExistsYear = yearExists(year);
     if (!isExistsYear) {
-      div.innerText = `El dato (${
+      renderCalendar.innerText = `El dato (${
         year ? year : "---"
       }) introducido no es un año valido.`;
       return;
@@ -50,18 +84,12 @@ const yearDate = 2022;
 
     const { isExistsMonth } = monthExists(month);
     if (month !== "" && !isExistsMonth) {
-      div.innerText = `El dato (${
+      renderCalendar.innerText = `El dato (${
         month ? month : "---"
       }) introducido no es un mes valido.`;
       return;
     }
     createCalendar(year, month);
-  };
-
-  // Check Year
-  const yearExists = (year) => {
-    const n = Number(year);
-    return year !== "" && !isNaN(n) && n >= 1970;
   };
 
   //Check Month
@@ -87,25 +115,12 @@ const yearDate = 2022;
     }
   };
 
-  //Imprimos los dias del mes
-  //  const printDaysMonth = (dayMonth, container, startOn) => {
-  //   for (let i = 0; i < dayMonth; i++) {
-  //     const divDays = document.createElement("div");
-  //     divDays.classList.add("divDays");
-  //     if (i === 0) {
-  //       divDays.style.gridColumnStart = startOn;
-  //     }
-  //     divDays.innerText = i + 1;
-  //     container.append(divDays);
-  //   }
-  // };
-
   //Get All Days Months
   const printAllDaysMonths = (year) => {
     Object.values(MONTHS).forEach((val) => {
       const dayMonth = new Date(year, val + 1, 0).getDate();
       // const startOn = new Date(year, val, 1).getDay();
-      for (let i = 0; i < dayMonth; i++) {
+      for(let i = 0; i < dayMonth; i++){
         const divAllDaysMonths = document.createElement("div");
         divAllDaysMonths.classList.add("DaysCss");
       }
@@ -113,40 +128,108 @@ const yearDate = 2022;
   };
 
   const createCalendar = (year, month) => {
-    const div = document.getElementById("renderTable");
-    div.innerText = "";
+    renderCalendar.innerText = "";
     const { isExistsMonth, monthName } = monthExists(month);
+    const oneMonth = false;
     if (isExistsMonth) {
-      createTable(monthName, year);
+      const oneMonth = true;
+      createOneMonth(monthName, year, oneMonth);
     } else {
       for (let i = 0; i < 12; i++) {
-        createTable(i, year);
+        createAllMonths(i, year, oneMonth);
       }
     }
   };
-
-  //Pint Table Month
-  const createTable = (month, year) => {
-    console.log("Mes: " + month);
-    console.log(year);
-    const div = document.getElementById("renderTable");
-
+  const createOneMonth = (month, year) => {
+    //Contenedor Mes
+    const boxMonth = document.createElement("div");
+    boxMonth.classList.add("containerMonth");
+    //Contenedor Dias de la semana y dias del mes
     const container = document.createElement("div");
-    container.classList.add("boxCalendar");
+    container.classList.add("boxMonth");
     const intl = new Intl.DateTimeFormat(locale, { month: "long" });
     const monthName = intl.format(new Date(year, month));
-    const title = document.createElement("h1");
-    title.innerText = `${monthName} ${year}`;
 
-    div.append(title);
+    //Un mes en concreto
+    const title = document.createElement("h1");
+    title.classList.add("h1Title");
+    title.innerText = `${monthName} ${year}`;
+    boxMonth.append(title);
+    //
+
     getDaysWeek(locale, container);
 
     //Month Year Number
     const monthNumber = month;
     const yearNumber = year;
+
     getDaysMonth(monthNumber, yearNumber, container);
-    div.append(container);
+    boxMonth.append(container);
+    renderCalendar.append(boxMonth);
   };
+
+  const createAllMonths = (month, year) => {
+    //Todo el Calendario H1
+    const h1 = document.querySelector(".h1Calendar");
+    h1.innerText = `Calendario de el año ${year}`;
+    const boxMonth = document.createElement("div");
+    boxMonth.classList.add("containerMonth");
+    //Contenedor Dias de la semana y dias del mes
+    const container = document.createElement("div");
+    container.classList.add("boxMonth");
+    const intl = new Intl.DateTimeFormat(locale, { month: "long" });
+    const monthName = intl.format(new Date(year, month));
+
+    //Un mes en concreto
+    const title = document.createElement("h1");
+    title.classList.add("h1Title");
+    title.innerText = `${monthName}`;
+    boxMonth.append(title);
+    //
+
+    getDaysWeek(locale, container);
+
+    //Month Year Number
+    const monthNumber = month;
+    const yearNumber = year;
+
+    getDaysMonth(monthNumber, yearNumber, container);
+    boxMonth.append(container);
+    renderCalendar.append(boxMonth);
+
+  };
+  //Pint Table Month
+  // const createMonth = (month, year, oneMonth) => {
+  //   //Todo el Calendario H1
+  //   const h1 = document.querySelector(".h1Calendar");
+  //   h1.innerText = `Calendario de el año ${year}`;
+  //   //
+  //   //Contenedor Mes
+  //   const boxMonth = document.createElement("div");
+  //   boxMonth.classList.add("containerMonth");
+  //   //Contenedor Dias de la semana y dias del mes
+  //   const container = document.createElement("div");
+  //   container.classList.add("boxMonth");
+  //   const intl = new Intl.DateTimeFormat(locale, { month: "long" });
+  //   const monthName = intl.format(new Date(year, month));
+
+  //   //Un mes en concreto
+  //   const title = document.createElement("h1");
+  //   title.classList.add("h1Title");
+  //   title.innerText = `${monthName} ${year}`;
+  //   boxMonth.append(title);
+  //   //
+
+  //   getDaysWeek(locale, container);
+
+  //   //Month Year Number
+  //   const monthNumber = month;
+  //   const yearNumber = year;
+
+  //   getDaysMonth(monthNumber, yearNumber, container);
+  //   boxMonth.append(container);
+  //   renderCalendar.append(boxMonth);
+  // };
 
   const getDaysWeek = (locale, container) => {
     const intl = new Intl.DateTimeFormat(locale, { weekday: "long" });
@@ -159,21 +242,31 @@ const yearDate = 2022;
   };
 
   const getDaysMonth = (month, year, container) => {
-    console.log("getDaysMonth: " + month, year);
     const dayMonth = new Date(year, month + 1, 0).getDate();
-    console.log("Dias del mes: " + dayMonth);
     const startOn = new Date(year, month, 1).getDay();
-
-    printDaysMonth(dayMonth, container, startOn);
+    printDaysMonth(dayMonth, container, startOn, month, year);
   };
 
   //Imprimos los dias del mes
-  const printDaysMonth = (dayMonth, container, startOn) => {
+  const printDaysMonth = (dayMonth, container, startOn, month, year) => {
     for (let i = 0; i < dayMonth; i++) {
       const divDays = document.createElement("div");
       divDays.classList.add("divDays");
+      //Dia Actual
+      const d = new Date();
+      const actualDay = d.getDate();
+
+      const m = new Date();
+      const actualMonth = m.getMonth();
+
+      //Año Actual
+      const y = new Date();
+      const actualYear = y.getFullYear();
       if (i === 0) {
         divDays.style.gridColumnStart = startOn;
+      }
+      if (i === actualDay - 1 && actualMonth == month && year == actualYear) {
+        divDays.style.cssText = "background-color:blue";
       }
       divDays.innerText = i + 1;
       container.append(divDays);
