@@ -54,22 +54,9 @@ const locale = "es";
 
   form.addEventListener("submit", (e) => {
     e.preventDefault();
+
     const formData = new FormData(e.target);
     checkData(Object.fromEntries(formData));
-
-    // if(!year && year < 1970){
-
-    // }
-
-    //Month && Year
-    const { isExists, month: monthName } = monthExists(month);
-    const { isExistsYear, year: yearName } = yearExists(year);
-    if (isExists && isExistsYear) {
-      createTable(monthName, yearName);
-    } else if (!isExists && isExistsYear) {
-      getAllMonths(year);
-    }
-    //div.innerText = " El dato introducido no es un mes ni un año";
   });
 
   const checkData = ({ month, year }) => {
@@ -101,30 +88,10 @@ const locale = "es";
     };
   };
 
-  //Print All Months
-  const getAllMonths = (year) => {
-    const divAllMonths = document.createElement("div");
-    for (let keys of Object.keys(MONTHS)) {
-      divAllMonths.classList.add("divAllMonths");
-      const p = document.createElement("p");
-      p.innerText = " " + `${keys}`;
-      divAllMonths.append(p);
-      div.append(divAllMonths);
-
-      printAllDaysMonths(year);
-    }
-  };
-
-  //Get All Days Months
-  const printAllDaysMonths = (year) => {
-    Object.values(MONTHS).forEach((val) => {
-      const dayMonth = new Date(year, val + 1, 0).getDate();
-      // const startOn = new Date(year, val, 1).getDay();
-      for(let i = 0; i < dayMonth; i++){
-        const divAllDaysMonths = document.createElement("div");
-        divAllDaysMonths.classList.add("DaysCss");
-      }
-    });
+  // Check Year
+  const yearExists = (year) => {
+    const n = Number(year);
+    return year !== "" && !isNaN(n) && n >= 1970;
   };
 
   const createCalendar = (year, month) => {
@@ -266,7 +233,8 @@ const locale = "es";
         divDays.style.gridColumnStart = startOn;
       }
       if (i === actualDay - 1 && actualMonth == month && year == actualYear) {
-        divDays.style.cssText = "background-color:blue";
+        // divDays.style.cssText = "background-color:blue";
+        divDays.classList.add("activeDay");
       }
       divDays.innerText = i + 1;
       container.append(divDays);
